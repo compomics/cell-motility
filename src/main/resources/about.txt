@@ -1,0 +1,349 @@
+0. Table of contents.
+---------------------
+
+ 0. Table of contents
+
+ 1. Introduction
+
+ 2. Using the program
+    2.a. Loading cell motion data from file(s)
+    2.b. visualizing the cell motion data
+        1) The motion path plot
+        2) The mean squared displacements plot
+        3) The reporting pane
+    2.c. Setting the look and feel
+    2.d. Setting the maximum number of iterations
+    2.e. Setting the initial values for S and P
+    2.f. Setting the detail level of the plot of the fitted function
+    2.g. Generating a full report
+    2.h. Generating a statistical report
+    2.i. About the exponential curve fitting
+
+ 3. Writing custom extensions to cell_motility
+
+ 4. Miscellaneous remarks
+
+ 5. Troubleshooting
+
+ 6. About the author
+
+ 7. Revision history
+
+
+
+
+1. Introduction.
+----------------
+This program is meant to be used as a convenient tool to visualize information about cell motion and to calcute
+a few standard approaches to judging the randomness of the motion.
+
+The program is written by Lennart Martens (lennart.martens AT UGent.be) and any information or problem not covered can
+be posted to the author. Also feel free to contact me whenever you have suggestions/enhancements/comments to report.
+
+Notes about this text:
+
+    - Keys to be pressed are always capitalized and contained in brackets, eg.: (B) means pressing the 'b' character
+      key on the keyboard.
+
+
+2. Using the Program.
+---------------------
+    2.a. Loading cell motion data from file(s).
+    -------------------------------------------
+    On the main screen of the program (the one that pops up when you run it), you'll see a menu bar.
+    In the 'File' section (pressing (ALT) + (F) will open the menu as well), there is an 'Open...' menu item.
+    A dialog window pops up, showing you several input fields. The first of these is the input folder. You can
+    either manually specify a folder, or use the 'Browse...' button. Clicking this button leads you to to a
+    filesystem browser window that allows you to select the appropriate source folder.
+    Note that the program attempts to read all files in this folder, yet will only retain those that correspond with
+    the correct formatting. You are advised to reserve the folder for cell motion files only however, as every now
+    and then, by lucky change, an unrelated file will seemingly correspond to this formatting and cause errors
+    downstream. Correct formatting is a series of (x, y) coordinates, with one set of coordinates per line,
+    and the coordinates separated by either ' ' (space), <TAB> (tab separation) or ';' (semicolon).
+    A header line can be present and, if non-numerical, will be skipped automatically.
+    Once you have selected the appropriate folder, the next textfield must be used to specify the interval (in
+    seconds) between recordings. Note that this interval is considered a constant both within the cell motion data
+    files and across all of those files in the specified folder!
+    The following part of the input deals with the X and Y length units employed. A number of units are predefined
+    (nm, µm, mm, cm). These can potentially be extended, yet should suffice for most users. Additionally, you
+    can opt to specify a conversion factor (as most cell motion data files are in pixel units). This conversion
+    factor should be known to you from the microscope settings. Note that the unit length settings are again
+    indiscriminately applied to all cell motion data files in the specified folder.
+    The dropdown you are confronted with next contains all the known ways to calculate mean squared displacements.
+    Simply choose the one you favour here; in short: non-overlapping MSD will yields fewer data points, but these
+    are truly independent, while overlapping MSD yields more data points but at the price of being correlated
+    because of the overlap.
+    Finally, a progress bar will keep you informed of the proceedings while loading.
+    When all the files are loaded into the system, they will be displayed in the tree at the left. Clicking any
+    element in the tree will display the details for that cell motion path on the right hand side (see below for
+    a more thorough description of these views).
+
+    2.b. Visualizing the cell motion data.
+    --------------------------------------
+    The main screen consists of multiple parts which all visualize a different view on the cell motion data.
+    All sections can be resized according to your preferences using the separation bars shown. There are also
+    convenient arrows on these separation bars that allow you to completely hide a certain panel with a single
+    click.
+    Each of these views will now be covered in some more detail.
+
+        1) The motion path plot:
+            This view shows the actual motion path of the cell, based on the (x, y) coordinate pairs read.
+            Directionality is shown by blue arrows halfway on the connecting line between two points.
+            The step number is indicated as well - this is coloured blue for steps that actually involve
+            movement, and red for those that represent stationary steps. Also note that stationary steps
+            are indicated by red circles around that location. Whenever multiple stationary steps occur at a
+            certain location, the step numbers are given in sequence from left to right for that spot.
+            Large black dots indicate actual (x, y) recordings, the green dot represents the start location
+            and the red dot the end location.
+            Finally, in the upper left corner a simple scale indicates a single unit of length in each dimension.
+            The arrows are color-coded to show you possible deviations. The longer scale is always rendered in
+            bue, the shorter one in red. When the lengths of the two scale units match up (which you can achieve
+            by resizing the plot in the horizontal and/or vertical direction), both will be rendered in black
+            and two red dotted lines will connect the units, forming a square.
+            Using these visual aids, it should be relatively straightforward for you to resize the panel
+            and thereby creating a plot with equally-sized axes.
+
+        2) The mean squared displacements plot:
+            This view shows the mean squared displacements plotted against time interval. The axes are labelled to give
+            a rough indication of the scale and shape of the curve.
+            Black dots indicate the actual data points, blue curve is the fitted random walk equation and vertical
+            red lines represent distances from measured values to the corresponding fitted values. As such, the red
+            lines give a rough indication of the goodness of fit.
+
+        3) The reporting pane:
+            This view (which always starts out rather smallish near the bottom) contains a text based report for the
+            currently selected file. This report can be presented as plain text (using tab characters to separate
+            table columns), comma-separated values (CSV) text (using a semicolon as separator) and HTML formatted
+            text (employs more pleasing visual styles). The report details the following information:
+             * The filename from which the data was read.
+             * The original data as read from file, but already corrected with the conversion factor (if any).
+             * The calculations performed on the data, being:
+                + The mean squared displacement for each time interval
+                + The exponential curve fitting (see section '2.g. About the curve fitting' below).
+                    - The number of iterations for the fit and whether or not the iterations completed.
+                    - The values for S and P.
+                    - The least squares value as an estimate of the goodness of fit.
+            The reporting pane allows you to save its contents to a file using the 'Save to file...' button. Note
+            that the appropriate file extension is chosen depending on the current view. All formatting is maintained
+            during the saving.
+
+    2.c. Setting the look and feel.
+    -------------------------------
+    This setting is located in the 'Settings' menu, under 'Look and feel...' (or (ALT) + (S) for the 'Settings' and
+    (ALT) + (L) for the 'Look and feel...' menu.
+    A nice feature in any Java 1.2 and above Virtual Machine is a graphical user interface (which is called 'Swing')
+    which can take different forms. Typically these are Metal (the default, platform independent look and feel),
+    Windows (on Windows platforms) and the Methusaleh of XWindows: Motif. You can specify any of these, and possible
+    some other look & feel options (the program attempts to find out which ones are installed for your platform).
+    These settings should only affect the handling of the program, and never the effective operations performed.
+
+    2.d. Setting the maximum number of iterations.
+    ----------------------------------------------
+    For the technical implications, see section '2.i. About the curve fitting' below.
+    This menu option allows you to specify a new value for the maximum number of iterations during the curve-fitting
+    process. The default value as well as the current value are indicated. Changing this value necessitates a
+    reloading of the cell motion data files to take effect as all calculations are performed directly during the
+    loading of the files. This value should be reasonably high. A few hundred thousand iterations make sense.
+    Convergence (the lack of improvement between subsequent iterations) is often only achieved after a lot of
+    attempts. It would make more sense to use this option as a way to increase the maximum iterations when the
+    fitting to your data files consistently fails to complete. Note that certain data files generate such a set
+    of data points that convergence is not likely to occur in a reasonable time. It is usually worthwhile to have
+    an in-depth look at such data and judge whether it is actually amenable for random walk analysis.
+
+    2.e. Setting the initial values for S and P
+    -------------------------------------------
+    For the technical implications, see section '2.i. About the curve fitting' below.
+    This menu option allows you to specify a new initial value for both S and P as starting points for the
+    curve-fitting process. The default value as well as the current value are indicated for each.
+    Changing these values necessitates a reloading of the cell motion data files to take effect as all calculations
+    are performed directly during the loading of the files. Estimates for these values can be obtained by calulcating
+    several easily-fit motion paths and using the statistics option form the 'Generate' menu to derive averages for
+    each. Note that changing these values might influence the end results you obtain for S and P. As such, you are
+    stringly recommended to include your starting values for S and P in any manuscripts.
+
+    2.f. Setting the detail level of the plot of the fitted function.
+    -----------------------------------------------------------------
+    The fitted function is plotted in blue on the mean squared displacements plot (see section 2.b.2). The plot
+    itself actually consists of linear segments, constructed by calculating the resultant values for an X-value
+    of 'x' and an X-value of 'x+increment'. It is this 'increment' that can be specified here. A large increment
+    will calculate faster, but generate a rougher plot. A small increment can potentially yield a more fine-grained
+    plot, but will cost a lot more in calculation time. It is usually a good idea to keep the increment above 1,
+    unless your X-scale has a really small range. The default and currently selected values are always represented
+    on the dialog for reference.
+
+    2.g. Generating a full report.
+    ------------------------------
+    The 'Generate' menu sports a 'Full report' item that will simply concatenate all the individual reports for each
+    file that is currently loaded and present these in a separate reporting pane (see section 2.b.3 on details about
+    the reporting pane).
+
+    2.h. Generating a statistical report.
+    -------------------------------------
+    The second option in the 'Generate' menu will pop up a text dialog showing text-based, CSV or HTML output
+    of basic descriptive statistics (mean and standard deviation), as well as robust descriptive statistics
+    which are robust against outliers (median and Huber scale) for S and P across all currently loaded cell
+    motion paths. Note that close agreement between mean and median are signs that the distribution of S and
+    P values, respectively, do not have many (strong outliers). A big difference between the mean and median
+    on the other hand, indicates outlier, which should be visible in a broad standard deviation for that parameter,
+    and a much smaller Huber scale. 
+
+    2.i. About the exponential curve fitting.
+    -----------------------------------------
+    The curve being fit is calculated as the random walk function derived by Dunn (1983) and Othmer et al. (1988)
+    and takes the form of:
+
+                                f(t) = n * S^2 * P * (t - P * (1 - e^(-t/P)))
+
+    where '*' indicates multiplication, and '^' indicates an exponent ('3^2' means 'three, squared').
+    t is the time interval, n the number of dimensions (taken to be 2) and S and P are the parameters we are trying
+    to fit. S is the root mean square speed of the cells, P the persistence time.
+    The actual algorithm for the curve fitting is based upon the Nelder and Mead simplex method and the relevant
+    implementation used has been coded by Dr. Michael Thomas Flanagan (http://www.ee.ucl.ac.uk/~mflanaga/). This
+    part of the software is presented in the separate flanagan jar file (which constitutes the only dependency
+    for this project).
+    Like all non-linear regression algorithms, the Nelder-Mead simplex algorithm is iterative in nature. It starts from
+    probable guesses for S and P (which you can define via the 'Settings' menu, see point 2.e) and subsequently
+    searches parameter space in an 'intelligent' way to find the best possible fit. The best possible fit is defined
+    as the 'least sum of squares', ie.: the minimum for the function that shows the sum of squares of the difference
+    between observed and predicted values for each recorded X-value.
+    These iterations are considered complete when the sum of squares of two sequential iteration steps differ less than
+    a specified amount (the convergence criterium). Of course, a maximum number of iterations is set such that
+    calculation will eventually halt even though convergence might not be reached. This maximum number of iterations is
+    best taken to be a large number (default for cell_motility is 300.000) on modern computers as they can quickly plow
+    through all the calculations (typically a few seconds for 300.000 iterations with the above random walk function).
+    When convergence is not reached, it is possible to extend the maximum number of iterations, however, there might
+    not be a final solution for certain cases, and you are advised to look carefully at data that does not converge,
+    even with a large allowance of iterations. Perhaps an exponential random walk function is not the ideal way to
+    represent your data then.
+
+
+3. Writing custom extensions to cell_motility.
+----------------------------------------------
+It is very easy to add your own mean squared displacements (MSD) calculator to cell_motility in case you are not
+convinced by the two options provided with the program.
+All you need to do is write an implementation of the following interface:
+
+     be.proteomics.cell_motility.interfaces.AverageDisplacements
+
+You should then locate the following text file (it is in the root of the cell_motility jar file):
+
+     AverageDisplacementImplementations.properties
+
+This file contains some helpful comments on the top, but you simply need to provide a meaningful label for
+your implementation (this will be shown to the user in the MSD dropdown box) and the fully qualified classname
+for your implementation. If you want to remove an implementation from cell_motility, simply 'comment-out' the
+corresponding line by prefixing it with a hash ('#'). You can of course also delete the corresponding line, but
+then it might be difficult to get it back if you might ever do need it again.
+Finally, make sure your new implementation class as well as the edited properties file are in the classpath.
+You should now see your implementation in the dropdown selection box.
+
+
+4. Miscellaneous remarks.
+-------------------------
+ - This program is provided 'as is'. No responsability will be taken by the author for accidental or other damage!
+   The user utilizes the program purely at her or his own risk! The author advises to make regular back-ups of all
+   important data (and not because he does not have faith in cell_motility, but because he has little faith
+   in computers at large).
+ - Whenever you use the program for basic research, please include an appropriate reference to the publication
+   associated with cell_motility.
+   The cell_motility paper is available for free through the BMC Bioinformatics journal website.
+   Reference: Martens L, Monsieur G, Ampe C, Gevaert K and Vandekerckhove J, 'Cell_motility: a cross-platform,
+   open source application for the study of cell motion paths', BMC Bioinformatics, 2006, 7:289.
+   You can also download the cell_motility paper for free here:
+   http://www.biomedcentral.com/1471-2105/7/289
+ - If this program is used for commercial purposes, be so kind as to inform the author (lennart.martens AT UGent.be)
+ - If you have any questions/suggestions/whatever: lennart.martens AT UGent.be
+
+
+5. Troubleshooting.
+-------------------
+General remark: run the program with 'java' instead of with 'javaw' on windows platforms. This way, a dos box pops
+open which will display stack traces of all unexpected errors that occur deep within the routines. These often tell
+you a lot about what went wrong.
+
+ - I get a strange error when I try to run the 'cell_motility.sh' shell script for Linux/UNIX, what's wrong?
+   There's a two-part answer for this, please read both parts before you try anything.
+   * First of all, it's a BASH (Bourne Again SHell) script, so if you're on another shell, you probably need to make
+   some adjustements. If you're unsure as to how to go about this, contact your system administrator for help.
+   * Secondly, due to different endline characters on Windows and Linux/*NIX operating systems, some of the latter
+   seem to have some difficulty in interpreting text files that have been created on the former. This might be your
+   problem. Try to edit the script file using a text editor like graphical VIM (gVIM) and to save it in 'UNIX' format.
+   If you do not have access to such a text editor (which automatically converts the endlines to the desired type)
+   or you have no idea how to go about this, the plain vanilla solution is to print out the contents of the file
+   and re-type them in a new file that you then make executable.
+
+ - I want to load cell motion files formatted in a way that is not understood by the program!
+   Unfortunately, the only way to load cell motion data right now is using files formatted as described in section
+   '2.a. Loading cell motion data from file(s)'.
+
+ - I really like your program and I would like to buy it.
+   I appreciate your offer, but no thanks. I like to consider myself a scientist, and I don't like to consider
+   myself as a businessman. Please use the tool for free for the rest of your life, but a little E-mail telling me
+   you liked it would be great (lennart.martens AT UGent.be).
+
+ - I have some trouble finding a Java Virtual Machine for my specific system/architecture.
+   Sorry, but all I can do is ask you to contact your system provider or search the internet for a solution:
+   www.google.com is a good point to start. Don't despair too quickly: many systems in fact support Java
+   (Mac, Windows, Linux, Solaris, ...) and many architectures as well (Motorola(Apple), Intel, Alpha, IBM
+   mainframes, ...)
+
+ - Nobody can help me with my problem and the manual doesn't help a bit!
+   Maybe you could E-mail me whatever troubles you; together we'll work it out!
+   lennart.martens AT UGent.be
+
+
+6. About the author.
+--------------------
+Dr. Lennart Martens (lennart.martens AT UGent.be) is a researcher in the lab of
+Prof. Dr. Joël Vandekerckhove in the University of Ghent, Ghent, Belgium.
+At the time of this writing he is supported by an FWO scholarship (the FWO is the National Fund for Scientific
+Research in Flanders, www.fwo.be) and is specializing in bioinformatics with a focus on proteomics.
+http://www.proteomics.be/people/lennartmartens/index.html
+
+
+7. Revision history.
+--------------------
+ - Version 1.0
+        * Initial release.
+
+ - Version 1.0.1
+        * Minor user-interface updates.
+
+ - Version 1.0.2
+        * Added color-coding and squaring of cell motion plot length units to aid in resizing.
+
+ - Version 1.0.3
+        * When the loaded data contains negative coordinates, the smallest one of these is taken and both
+          X and Y coordinates are augmented by the absolute value of this smallest coordinate. This
+          makes sure all coordinates are positive (or zero) and makes drawing the path a lot easier.
+          Note that this does not in any way interfere with the calculations or the results.
+        * The 'Transformed Original Data' section of the report now shows two decimal numbers instead of none.
+
+ - Version 1.1
+        * Added the possibility to choose between overlapping and non-overlapping mean squared displacements
+          calculations.
+        * Created an automatically loaded, descriptive framework for the mean squared displacements calculators
+          so it is almost trivial to add a custom-built one by third parties.
+        * Added a simple descriptive statistics report for S and P for all loaded cell paths.
+
+ - Version 1.1.1
+        * Added reference and link to the freely available cell_motility article online.
+
+ - Version 1.1.2
+        * Fixed a bug in the statistics report. The values for S were also used for P,
+          leading to apparent identical results in both S and P, but only in the statistics
+          report.
+
+ - Version 1.1.3
+        * Fixed a bug in the graph (chart) output. Sometimes the graph (chart) would show
+          Y-values for the fitted MSD curve for negative time values (which would result in
+          strange and unexpected lines radiating from near the origin). This has now been fixed.
+
+ - Version 1.2
+        * Allowed the user to specify alternate starting values for S and P via the 'Settings' menu.
+        * Added robust descriptive statistics (median and Huber scale) to the 'Generate' --> 'Statistics' menu.
+
+ - Version 2.0
+        * Updated package names to com.compomics instead of be.proteomics.
+        * Migrated project structure to Maven2.
+        * Moved project hosting to Google Code.
