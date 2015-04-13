@@ -15,7 +15,7 @@ Migration is an important aspect of cellular behaviour and is therefore widely s
 For these reasons, the cell-motility package was developed to support convenient, free cell motion path analysis.
 
 ### Citation
-*Martens et al. Cell Motility: a cross-platform, open source application for the study of cell motion paths. BMC Bioinformatics (2006) vol. 7 pp 289 ([http://www.ncbi.nlm.nih.gov/pubmed/16762054 pid: 16762054])*
+*Martens et al. Cell Motility: a cross-platform, open source application for the study of cell motion paths. BMC Bioinformatics (2006) vol. 7 pp 289 ([pid: 16762054](http://www.ncbi.nlm.nih.gov/pubmed/16762054))*
 
 [Go to top of page](#cell-motility)
 
