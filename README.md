@@ -22,7 +22,7 @@ For these reasons, the cell-motility package was developed to support convenient
 ----
 
 ## Download
-Download the latest version of cell-motility 2.0 as a zip file [here](http://genesis.ugent.be/uvpublicdata/cell_motility/cell-motility-2.0.zip).
+Download the version 2.0 of cell-motility as a zip file [here](http://genesis.ugent.be/uvpublicdata/cell_motility/cell-motility-2.0.zip).
 
 [Go to top of page](#cell-motility)
 
